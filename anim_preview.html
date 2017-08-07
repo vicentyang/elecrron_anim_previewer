@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <style type="text/css">
+        ul,
+        button {
+            cursor: pointer;
+        }
+
+        li:hover {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <ul id="historyTb">
+    </ul>
+    <input id="frameRate" type="number" name="frameRate" placeholder="frameRate" value='24'>
+    <input id="frameRate" type="select" name="frameRate" placeholder="frameRate" value='24'>
+    <center>
+        <p id=""></p>
+        <button id='mainBtn' style="margin-top:10px;">预览</button>
+        <button id='stopBtn'>stop</button>
+    </center>
+    <center>
+        <canvas id="canvas" style="border:2px solid; margin: 0;padding: 0;margin-top:20px;" width="540" height="540"></canvas>
+    <center>
+    <input id="addr" style="width: 100%" placeholder="addr" name="">
+    <button id="har">download</button>
+</body>
+<script type="text/javascript">
+    const mainBtn = document.getElementById('mainBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const historyTb = document.getElementById('historyTb');
+    const frameRate = document.getElementById('frameRate');
+
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+
+    var fs = require('fs');
+    var path = require('path');
+
+
+
+
+    var _path = '/Users/vicent/Downloads/xiaolong';
+
+    var intervalId;
+
+    // 这两个没有写 貌似框会不见
+    canvas.ondragover = () => {
+        return false;
+    };
+
+    canvas.ondragleave = canvas.ondragend = () => {
+        return false;
+    };
+
+    initHistoryTb();
+
+    historyTb.onclick = function (e) {
+        mainBtn.innerHTML = _path = e.target.innerText
+        // console.log('anim_preview.html>>>45', e.target.innerText);
+    };
+
+    function initHistoryTb() {
+        var historyData = localStorage.getItem('animPreviewHistory');
+        if (!historyData) {
+            return false;
+        }
+        var historyList = JSON.parse(historyData);
+        if (historyList['historyList'] instanceof Array) {
+            for (var i = 0; i < historyList['historyList'].length; i++) {
+                appendHistoryLi(historyList['historyList'][i]);
+            }
+        }
+
+    }
+
+    function appendHistoryLi(_pathItem) {
+        var li = document.createElement('li');
+        historyTb.appendChild(li);
+        li.innerHTML = _pathItem;
+    }
+
+    function animation() {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        console.log('anim_preview.html>>>40', frames[currentFrame]);
+
+        context.drawImage(frames[currentFrame], (canvas.width - frames[currentFrame].width) / 2, (canvas.height - frames[currentFrame].height) / 2);
+
+        currentFrame = (currentFrame + 1) % frames.length;
+
+    }
+
+    canvas.ondrop = (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+
+        mainBtn.innerHTML = _path = file.path;
+        setLocalStorage(file.path);
+        return false;
+    };
+
+    function setLocalStorage(_path) {
+        var animPreviewHistory = localStorage.getItem('animPreviewHistory');
+        var historyList;
+        if (!animPreviewHistory) {
+            historyList = {
+                'historyList': []
+            }
+        } else {
+
+            historyList = JSON.parse(animPreviewHistory);
+        }
+        if (historyList['historyList'].indexOf(_path) !== -1) {
+            return;
+        }
+        historyList['historyList'].push(_path)
+        localStorage.setItem('animPreviewHistory', JSON.stringify(historyList));
+
+        appendHistoryLi(_path);
+
+    }
+
+    mainBtn.onclick = () => {
+
+        previewAnimation(_path);
+    };
+
+    stopBtn.onclick = () => {
+        console.log('anim_preview.html>>>126', frameRate.value);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        if (intervalId) {
+
+            clearInterval(intervalId);
+            // mainBtn.innerHTML = "play";
+        }
+    };
+
+
+
+
+    function previewAnimation(_pathItem) {
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        var fillArr = fs.readdirSync(_pathItem);
+        var _fr = 1000 / frameRate.value;
+        var frames = [];
+        var frameNum = 0;
+        var currentFrame = 0;
+        // var completeNum = 0;
+
+        fillArr.forEach((children, index) => {
+            // console.log('anim_preview.html>>>134', children);
+            if (children.startsWith('.')) {
+                return;
+            }
+            var img = new Image();
+            var absolutePath = path.resolve(_path, children);
+            img.src = absolutePath;
+            img.onload = loadComplete;
+
+            frames.push(img);
+        });
+
+        function animation() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            context.drawImage(frames[currentFrame], (canvas.width - frames[currentFrame].width) / 2, (canvas.height - frames[currentFrame].height) / 2);
+            // console.log((canvas.width - frames[currentFrame].width)/2, (canvas.heig - frames[currentFrame].heig)/2)
+
+            currentFrame = (currentFrame + 1) % frames.length;
+
+        }
+
+        function loadComplete() {
+            frameNum += 1;
+            // console.log('anim_preview.html>>>153', frameNum);
+            if (frameNum >= frames.length) {
+                // console.log('play', 'showData');
+
+                intervalId = setInterval(animation, _fr);
+            }
+        }
+        console.log('anim_preview.html>>>159', frames.length);
+
+    }
+
+    function readFileFromBase64() {
+        fs.readFile('./data/aaa.png', function (err, squid) {
+            if (err) throw err;
+            var base64Image = new Buffer(squid, 'binary').toString('base64');
+            var base64 = 'data:image/png;base64,' + base64Image
+            var img = new Image();
+
+            img.src = base64;
+
+            ctx.drawImage(img, 0, 0, img.width / 4, img.height / 4);
+
+        });
+    }
+
+    // 放在electron中执行的时候可以
+//
+function show(data) {
+    var image = new Image();
+    var canvas = document.createElement('canvas');
+    canvas.style.position = 'absolute';
+    canvas.style.left = '300px';
+    var context = canvas.getContext('2d');
+    document.body.appendChild(canvas);
+    image.src = '/Users/vicent/Downloads/buttons.png';
+    image.onload = function () {
+        canvas.width = 800;
+        canvas.height = 800;
+        init();
+
+    }
+
+    function init() {
+        var ul = document.createElement('ul');
+        ul.style.width = '200px';
+
+        ul.onclick = function (el) {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            let _data = frames[el.target.title]['frame'];
+            context.drawImage(image, _data.x, _data.y, _data.w, _data.h, 0, 0, _data.w, _data.h);
+        }
+
+        document.body.appendChild(ul);
+        let frames = data.frames;
+        for (var frame in frames) {
+            var li = document.createElement('li');
+            li.title = frame;
+            li.innerHTML = frame;
+            ul.appendChild(li);
+        }
+    }
+}
+</script>
+
+<script name="downloadHar">
+        var downLoadHarBtn = document.getElementById('har');
+        var addr = document.getElementById('addr');
+
+        var chc = require('chrome-har-capturer');
+
+        var openChrome = '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 \
+              --enable-benchmarking \
+              --enable-net-benchmarking';
+
+        var saveHar = 'chrome-har-capturer -o out.har \https://netent-static.casinomodule.com/games/gunsnroses_mobile_html/game/gunsnroses_mobile_html.xhtml\?staticServer\=https%3A%2F%2Fnetent-static.casinomodule.com%2F\&gameName\=guns-n-roses.desktop\&targetElement\=game\&flashParams.bgcolor\=000000\&mobileParams.lobbyURL\=https%253A%252F%252Fwww.netent.com%252Fen%252Fsection%252Fentertain%252F\&gameId\=gunsnroses_not_mobile\&server\=https%3A%2F%2Fnetent-game.casinomodule.com%2F\&lang\=en\&sessId\=DEMO-1326561309862\&operatorId\=default'
+        var c = chc.load(['https://github.com',
+            'http://www.reddit.com',
+            'http://iwillfail',
+            'http://www.reddit.com/help/faq']);
+        c.on('connect', function () {
+            console.log('Connected to Chrome');
+        });
+        c.on('end', function (har) {
+            fs.writeFileSync('out.har', JSON.stringify(har));
+        });
+        c.on('error', function (err) {
+            console.error('Cannot connect to Chrome: ' + err);
+        });
+
+        downLoadHarBtn.onclick = function (e) {
+            // mainBtn.innerHTML = _path = e.target.innerText
+            console.log(addr.value);
+            // console.log('anim_preview.html>>>45', e.target.innerText);
+        };
+</script>
+
+</html>
