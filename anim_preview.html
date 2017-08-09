@@ -243,35 +243,35 @@ function show(data) {
 </script>
 
 <script name="downloadHar">
-        var downLoadHarBtn = document.getElementById('har');
-        var addr = document.getElementById('addr');
+        // var downLoadHarBtn = document.getElementById('har');
+        // var addr = document.getElementById('addr');
 
-        var chc = require('chrome-har-capturer');
+        // var chc = require('chrome-har-capturer');
 
-        var openChrome = '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 \
-              --enable-benchmarking \
-              --enable-net-benchmarking';
+        // var openChrome = '/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222 \
+        //       --enable-benchmarking \
+        //       --enable-net-benchmarking';
 
-        var saveHar = 'chrome-har-capturer -o out.har \https://netent-static.casinomodule.com/games/gunsnroses_mobile_html/game/gunsnroses_mobile_html.xhtml\?staticServer\=https%3A%2F%2Fnetent-static.casinomodule.com%2F\&gameName\=guns-n-roses.desktop\&targetElement\=game\&flashParams.bgcolor\=000000\&mobileParams.lobbyURL\=https%253A%252F%252Fwww.netent.com%252Fen%252Fsection%252Fentertain%252F\&gameId\=gunsnroses_not_mobile\&server\=https%3A%2F%2Fnetent-game.casinomodule.com%2F\&lang\=en\&sessId\=DEMO-1326561309862\&operatorId\=default'
-        var c = chc.load(['https://github.com',
-            'http://www.reddit.com',
-            'http://iwillfail',
-            'http://www.reddit.com/help/faq']);
-        c.on('connect', function () {
-            console.log('Connected to Chrome');
-        });
-        c.on('end', function (har) {
-            fs.writeFileSync('out.har', JSON.stringify(har));
-        });
-        c.on('error', function (err) {
-            console.error('Cannot connect to Chrome: ' + err);
-        });
+        // var saveHar = 'chrome-har-capturer -o out.har \https://netent-static.casinomodule.com/games/gunsnroses_mobile_html/game/gunsnroses_mobile_html.xhtml\?staticServer\=https%3A%2F%2Fnetent-static.casinomodule.com%2F\&gameName\=guns-n-roses.desktop\&targetElement\=game\&flashParams.bgcolor\=000000\&mobileParams.lobbyURL\=https%253A%252F%252Fwww.netent.com%252Fen%252Fsection%252Fentertain%252F\&gameId\=gunsnroses_not_mobile\&server\=https%3A%2F%2Fnetent-game.casinomodule.com%2F\&lang\=en\&sessId\=DEMO-1326561309862\&operatorId\=default'
+        // var c = chc.load(['https://github.com',
+        //     'http://www.reddit.com',
+        //     'http://iwillfail',
+        //     'http://www.reddit.com/help/faq']);
+        // c.on('connect', function () {
+        //     console.log('Connected to Chrome');
+        // });
+        // c.on('end', function (har) {
+        //     fs.writeFileSync('out.har', JSON.stringify(har));
+        // });
+        // c.on('error', function (err) {
+        //     console.error('Cannot connect to Chrome: ' + err);
+        // });
 
-        downLoadHarBtn.onclick = function (e) {
-            // mainBtn.innerHTML = _path = e.target.innerText
-            console.log(addr.value);
-            // console.log('anim_preview.html>>>45', e.target.innerText);
-        };
+        // downLoadHarBtn.onclick = function (e) {
+        //     // mainBtn.innerHTML = _path = e.target.innerText
+        //     console.log(addr.value);
+        //     // console.log('anim_preview.html>>>45', e.target.innerText);
+        // };
 </script>
 
 </html>
